@@ -363,16 +363,19 @@ static int do_mmcops(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 	}
 
 	state = MMC_INVALID;
-	if (argc == 5 && strcmp(argv[1], "read") == 0)
+
+	if (argc == 6 && strcmp(argv[1], "read") == 0)
 		state = MMC_READ;
-	else if (argc == 5 && strcmp(argv[1], "write") == 0)
+	else if (argc == 6 && strcmp(argv[1], "write") == 0)
 		state = MMC_WRITE;
-	else if (argc == 4 && strcmp(argv[1], "erase") == 0)
+	else if (argc == 5 && strcmp(argv[1], "erase") == 0)
 		state = MMC_ERASE;
 
 	if (state != MMC_INVALID) {
+		int dev = simple_strtoul(argv[2], NULL, 10);
+		curr_device = dev;
 		struct mmc *mmc = find_mmc_device(curr_device);
-		int idx = 2;
+		int idx = 3;
 		u32 blk, cnt, n;
 		void *addr;
 
@@ -430,9 +433,9 @@ static int do_mmcops(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 U_BOOT_CMD(
 	mmc, 6, 1, do_mmcops,
 	"MMC sub system",
-	"read addr blk# cnt\n"
-	"mmc write addr blk# cnt\n"
-	"mmc erase blk# cnt\n"
+	"read <device num> addr blk# cnt\n"
+	"mmc write <device num> addr blk# cnt\n"
+	"mmc erase <device num> blk# cnt\n"
 	"mmc rescan\n"
 	"mmc part - lists available partition on current mmc device\n"
 	"mmc dev [dev] [part] - show or set current mmc device [partition]\n"
