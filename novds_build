@@ -4,4 +4,4 @@ CROSS_COMPILE=arm-none-linux-gnueabi-
 ARCH=arm
 
 export CROSS_COMPILE ARCH
-make
+make -j2

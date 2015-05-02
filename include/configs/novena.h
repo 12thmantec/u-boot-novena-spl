@@ -18,8 +18,6 @@
 
 #include "imx6_spl.h"
 
-#undef DEBUG
-
 #undef CONFIG_SPL_LDSCRIPT
 #define CONFIG_SPL_LDSCRIPT     "board/$(BOARDDIR)/u-boot-spl-novena.lds"
 
@@ -334,5 +332,7 @@ extern char *config_sys_prompt;
 #ifndef CONFIG_SYS_DCACHE_OFF
 #define CONFIG_CMD_CACHE
 #endif
+
+#define CONFIG_CMD_MMC
 
 #endif			       /* __CONFIG_H * */

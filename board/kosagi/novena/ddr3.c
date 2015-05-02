@@ -1004,7 +1004,7 @@ static int tune_delays(uint32_t *dram_sdqs_pad_ctls)
 
 /* init ddr3, do calibrations */
 static uint32_t imx6qdl_ddr_init(struct i2c_pads_info *i2c_pad_info,
-				uint32_t *dram_sdqs_pad_ctls)
+				uint32_t *dram_sdqs_pad_ctls, int do_init)
 {
 	uint8_t spd[256];
 	uint8_t	chip;
@@ -1112,6 +1112,11 @@ static uint32_t imx6qdl_ddr_init(struct i2c_pads_info *i2c_pad_info,
 
 	ddrSPD.capacity = (64 / ddrSPD.devwidth) * ddrSPD.rank * ddrSPD.density;
 	debug("  Module capacity is %d GiB\n", ddrSPD.capacity / 8192);
+
+	if (!do_init) {
+		ram_size = ((ddrSPD.capacity / 8) - 256) * 1024 * 1024;
+		return ram_size;
+	}
 
 	if ((spd[SPD_MTB_DIVIDEND] != 1) || (spd[SPD_MTB_DIVISOR] != 8)) {
 		printf( "Module has non-standard MTB for timing calculation. "
@@ -1435,8 +1440,7 @@ static uint32_t imx6qdl_ddr_init(struct i2c_pads_info *i2c_pad_info,
 	return ram_size;
 }
 
-
-uint32_t imx6q_ddr_init(void)
+static uint32_t imx6q_ddr_get_size(int do_init)
 {
 	uint32_t dram_pads[] = {
 		MX6Q_IOM_DRAM_SDQS0,
@@ -1461,6 +1465,27 @@ uint32_t imx6q_ddr_init(void)
 			.gp = IMX_GPIO_NR(3, 28)
 		}
 	};
+
+	/*
+	 * These pins must be set to GPIO inputs, to prevent fighting
+	 * with the DDR3 I2C bus
+	 */
+	static iomux_v3_cfg_t const unused_i2c1_pins[] = {
+		MX6Q_PAD_EIM_D28__GPIO3_IO28 | MUX_PAD_CTRL(NO_PAD_CTRL),
+		MX6Q_PAD_EIM_D21__GPIO3_IO21 | MUX_PAD_CTRL(NO_PAD_CTRL),
+	};
+	imx_iomux_v3_setup_multiple_pads(unused_i2c1_pins,
+					ARRAY_SIZE(unused_i2c1_pins));
+	gpio_direction_input(IMX_GPIO_NR(3, 28));
+	gpio_direction_input(IMX_GPIO_NR(3, 21));
+
+	return imx6qdl_ddr_init(&i2c_pad_info0_6q, dram_pads, do_init);
+
+}
+
+
+uint32_t imx6q_ddr_init(void)
+{
 
 	writel(0x00000030, MX6Q_IOM_DRAM_SDQS0);
 	writel(0x00000030, MX6Q_IOM_DRAM_SDQS1);
@@ -1514,23 +1539,11 @@ uint32_t imx6q_ddr_init(void)
 	/* 40 Ohm drive strength for cs0/1,sdba2,cke0/1,sdwe */
 	writel(0x000C0000, MX6Q_IOM_GRP_DDR_TYPE);
 
-	/*
-	 * These pins must be set to GPIO inputs, to prevent fighting
-	 * with the DDR3 I2C bus
-	 */
-	static iomux_v3_cfg_t const unused_i2c1_pins[] = {
-		MX6Q_PAD_EIM_D28__GPIO3_IO28 | MUX_PAD_CTRL(NO_PAD_CTRL),
-		MX6Q_PAD_EIM_D21__GPIO3_IO21 | MUX_PAD_CTRL(NO_PAD_CTRL),
-	};
-	imx_iomux_v3_setup_multiple_pads(unused_i2c1_pins,
-					ARRAY_SIZE(unused_i2c1_pins));
-	gpio_direction_input(IMX_GPIO_NR(3, 28));
-	gpio_direction_input(IMX_GPIO_NR(3, 21));
+	return imx6q_ddr_get_size(1);
 
-	return imx6qdl_ddr_init(&i2c_pad_info0_6q, dram_pads);
 }
 
-uint32_t imx6dl_ddr_init(void)
+static uint32_t imx6dl_ddr_get_size(int do_init)
 {
 	uint32_t dram_pads[] = {
 		MX6DL_IOM_DRAM_SDQS0,
@@ -1555,6 +1568,27 @@ uint32_t imx6dl_ddr_init(void)
 			.gp = IMX_GPIO_NR(5, 26)
 		}
 	};
+	/*
+	 * These pins must be set to GPIO inputs, to prevent fighting
+	 * with the DDR3 I2C bus
+	 */
+	static iomux_v3_cfg_t const unused_i2c1_pins[] = {
+		MX6DL_PAD_CSI0_DAT10__GPIO5_IO28 | MUX_PAD_CTRL(NO_PAD_CTRL),
+		MX6DL_PAD_EIM_D28__GPIO3_IO28 | MUX_PAD_CTRL(NO_PAD_CTRL),
+		MX6DL_PAD_EIM_D21__GPIO3_IO21 | MUX_PAD_CTRL(NO_PAD_CTRL),
+	};
+	imx_iomux_v3_setup_multiple_pads(unused_i2c1_pins,
+					ARRAY_SIZE(unused_i2c1_pins));
+	gpio_direction_input(IMX_GPIO_NR(3, 28));
+	gpio_direction_input(IMX_GPIO_NR(3, 21));
+	gpio_direction_output(IMX_GPIO_NR(5, 28), 1);
+
+	return imx6qdl_ddr_init(&i2c_pad_info0_6dl, dram_pads, do_init);
+
+}
+
+uint32_t imx6dl_ddr_init(void)
+{
 
 	writel(0x00000030, MX6DL_IOM_DRAM_SDQS0);
 	writel(0x00000030, MX6DL_IOM_DRAM_SDQS1);
@@ -1608,22 +1642,8 @@ uint32_t imx6dl_ddr_init(void)
 	/* 40 Ohm drive strength for cs0/1,sdba2,cke0/1,sdwe */
 	writel(0x000C0000, MX6DL_IOM_GRP_DDR_TYPE);
 
-	/*
-	 * These pins must be set to GPIO inputs, to prevent fighting
-	 * with the DDR3 I2C bus
-	 */
-	static iomux_v3_cfg_t const unused_i2c1_pins[] = {
-		MX6DL_PAD_CSI0_DAT10__GPIO5_IO28 | MUX_PAD_CTRL(NO_PAD_CTRL),
-		MX6DL_PAD_EIM_D28__GPIO3_IO28 | MUX_PAD_CTRL(NO_PAD_CTRL),
-		MX6DL_PAD_EIM_D21__GPIO3_IO21 | MUX_PAD_CTRL(NO_PAD_CTRL),
-	};
-	imx_iomux_v3_setup_multiple_pads(unused_i2c1_pins,
-					ARRAY_SIZE(unused_i2c1_pins));
-	gpio_direction_input(IMX_GPIO_NR(3, 28));
-	gpio_direction_input(IMX_GPIO_NR(3, 21));
-	gpio_direction_output(IMX_GPIO_NR(5, 28), 1);
+	return imx6dl_ddr_get_size(1);
 
-	return imx6qdl_ddr_init(&i2c_pad_info0_6dl, dram_pads);
 }
 
 int novena_dram_init(void)
@@ -1638,5 +1658,11 @@ int novena_dram_init(void)
 
 int dram_init(void)
 {
+
+	if (is_cpu_type(MXC_CPU_MX6Q))
+		gd->ram_size = imx6q_ddr_get_size(0);
+	else
+		gd->ram_size = imx6dl_ddr_get_size(0);
+
 	return 0;
 }

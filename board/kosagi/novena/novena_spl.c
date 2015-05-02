@@ -212,8 +212,7 @@ void spl_board_init(void)
 
 u32 spl_boot_device(void)
 {
-	return BOOT_DEVICE_MMC1;
-/*
+
 	puts("Boot Device: ");
 	switch (get_boot_device()) {
 	case MX6_SD0_BOOT:
@@ -236,12 +235,13 @@ u32 spl_boot_device(void)
 		printf("UNKNOWN\n");
 		return BOOT_DEVICE_NONE;
 	}
-*/
+
 }
 
 u32 spl_boot_mode(void)
 {
-	return MMCSD_MODE_FAT;
+	//return MMCSD_MODE_FAT;
+	return MMCSD_MODE_RAW;
 /*
 	switch (spl_boot_device()) {
 	case BOOT_DEVICE_MMC1:
