@@ -136,8 +136,8 @@
 		"netdev=eth0\0"						\
 		"ethprime=FEC0\0"					\
 		"uboot_addr=0xa0000000\0"				\
-		"bootargs=console=ttymxc0,115200 ip=none root=/dev/ram0 rw fec_mac=00:00:AA:BB:CC:DD\0"\
-		"bootcmd=safeboot 1 0x1000 0x20000 0x14000 0x90800000 0x90800000 0x90c00000\0"
+		"bootargs=console=ttymxc0,115200 ip=none root=/dev/ram0 rw\0"\
+		"bootcmd=safeboot 0 0x1000 0x20000 0x16800 0x10800000 0x10800000 0x10c00000\0"
 
 
 /* Miscellaneous configurable options */
@@ -196,5 +196,23 @@ extern char *config_sys_prompt;
 
 #define LINUX_BOOT_PARAM_ADDR (PHYS_SDRAM + 0x100)
 #define CONFIG_MACH_TYPE 0xffffffff
+#define CONFIG_SAFEBOOT
+
+/* Framebuffer */
+/* #define CONFIG_VIDEO */
+#ifdef CONFIG_VIDEO                 
+#define CONFIG_VIDEO_IPUV3
+#define CONFIG_IPUV3_CLK 260000000
+#define CONFIG_CFB_CONSOLE
+#define CONFIG_CFB_CONSOLE_ANSI
+#define CONFIG_SYS_CONSOLE_ENV_OVERWRITE
+#define CONFIG_SYS_CONSOLE_IS_IN_ENV
+#define LCD_BPP		LCD_COLOR16
+#define CONFIG_CMD_BMP
+#define CONFIG_BMP_16BPP 1
+#define CONFIG_FB_BASE	(TEXT_BASE + 0x300000)
+#define CONFIG_SYS_WHITE_ON_BLACK
+#define CONFIG_VGA_AS_SINGLE_DEVICE
+#endif
 
 #endif			       /* __CONFIG_H * */
