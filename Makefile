@@ -388,7 +388,6 @@ $(obj)u-boot.bin:	$(obj)u-boot
 		$(OBJCOPY) ${OBJCFLAGS} -O binary $< $@
 		$(call DO_STATIC_RELA,$<,$@,$(CONFIG_SYS_TEXT_BASE))
 		$(BOARD_SIZE_CHECK)
-		cp $@ $(U_BOOT_VERSION).bin
 
 $(obj)u-boot.ldr:	$(obj)u-boot
 		$(CREATE_LDR_ENV)
@@ -416,6 +415,7 @@ $(obj)u-boot.img:	$(obj)u-boot.bin
 		-n $(shell sed -n -e 's/.*U_BOOT_VERSION//p' $(VERSION_FILE) | \
 			sed -e 's/"[	 ]*$$/ for $(BOARD) board"/') \
 		-d $< $@
+		cp $@ $(U_BOOT_VERSION).bin
 
 $(obj)u-boot.imx: $(obj)u-boot.bin depend
 		$(MAKE) $(build) $(SRCTREE)/arch/arm/imx-common $(OBJTREE)/u-boot.imx

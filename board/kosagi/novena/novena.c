@@ -127,7 +127,7 @@ int board_mmc_init(bd_t *bis)
 	return status;
 }
 
-char *config_sys_prompt = "Novena U-Boot > ";
+char *config_sys_prompt = "U-Boot > ";
 
 int board_early_init_f(void)
 {
@@ -136,6 +136,8 @@ int board_early_init_f(void)
 
 int board_init(void)
 {
+	/* address of boot parameters */
+	gd->bd->bi_boot_params = LINUX_BOOT_PARAM_ADDR;
 	return 0;
 }
 
