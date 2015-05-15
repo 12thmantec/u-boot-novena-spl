@@ -133,11 +133,52 @@ int board_early_init_f(void)
 {
 	return 0;
 }
+#define KNOB_SW (1 << 19)
+static void knob_init(void)
+{
+	unsigned int val;
+
+	imx_iomux_v3_setup_pad(MX6DL_PAD_EIM_A19__GPIO2_IO19 | MUX_PAD_CTRL(NO_PAD_CTRL));
+
+	/* knob switch button is connected GPIO2[19],so we should init
+	 * it as input, and then we can read the status of it
+	 * */
+	val = readl(GPIO2_BASE_ADDR + 0x4);
+	val &= ~KNOB_SW;
+	writel(val, GPIO2_BASE_ADDR + 0x4);
+}
+
+
+int knob_switch_pressed(void)
+{
+	unsigned int val;
+
+	val = readl(GPIO2_BASE_ADDR + 0x0);
+
+	return !(val & KNOB_SW);
+}
+#define CHECK_TIME 3
+void knob_switch_check(void)
+{
+	int count = CHECK_TIME;
+
+	while (count--) {
+		udelay(1000000);
+		if (!knob_switch_pressed())
+			break;
+	}
+	if (count < 0)
+		setenv("knob_switch_pressed", "1");
+	else
+		setenv("knob_switch_pressed", "0");
+}
+
 
 int board_init(void)
 {
 	/* address of boot parameters */
 	gd->bd->bi_boot_params = LINUX_BOOT_PARAM_ADDR;
+	knob_init();
 	return 0;
 }
 

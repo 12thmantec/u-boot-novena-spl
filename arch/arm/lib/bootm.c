@@ -25,6 +25,7 @@
 #if defined(CONFIG_ARMV7_NONSEC) || defined(CONFIG_ARMV7_VIRT)
 #include <asm/armv7.h>
 #endif
+#include <version.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -209,7 +210,18 @@ static void do_nonsec_virt_switch(void)
 /* Subcommand: PREP */
 static void boot_prep_linux(bootm_headers_t *images)
 {
-	char *commandline = getenv("bootargs");
+#ifdef CONFIG_CMDLINE_TAG
+	char bootargs[512];
+	char *knob_switch_pressed;
+	char *commandline = getenv ("bootargs");
+	knob_switch_pressed = getenv("knob_switch_pressed");
+	if (knob_switch_pressed == NULL || knob_switch_pressed[0] == '0')
+		knob_switch_pressed = "0";
+	else
+		knob_switch_pressed = "1";
+	sprintf(bootargs, "%s knob_switch_pressed=%s uboot_version=%s", commandline, knob_switch_pressed, U_BOOT_VERSION);
+	commandline = bootargs;
+#endif
 
 	if (IMAGE_ENABLE_OF_LIBFDT && images->ft_len) {
 #ifdef CONFIG_OF_LIBFDT

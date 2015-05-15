@@ -137,7 +137,7 @@
 		"ethprime=FEC0\0"					\
 		"uboot_addr=0xa0000000\0"				\
 		"bootargs=console=ttymxc0,115200 ip=none root=/dev/ram0 rw\0"\
-		"bootcmd=safeboot 0 0x1000 0x20000 0x16800 0x10800000 0x10800000 0x10c00000\0"
+		"bootcmd=safeboot 1 0x1000 0x20000 0x12000 0x10800000 0x10800000 0x10c00000\0"
 
 
 /* Miscellaneous configurable options */

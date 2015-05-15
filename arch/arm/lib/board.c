@@ -691,6 +691,8 @@ void board_init_r(gd_t *id, ulong dest_addr)
 		setenv("mem", (char *)memsz);
 	}
 #endif
+	extern void knob_switch_check(void);
+	knob_switch_check();
 
 	/* main_loop() can return to retry autoboot, if so just run it again. */
 	for (;;) {
