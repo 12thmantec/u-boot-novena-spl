@@ -81,7 +81,7 @@
 #define CONFIG_CMD_BMODE
 #define CONFIG_CMD_SETEXPR
 #define CONFIG_CMD_MEMTEST
-#define CONFIG_BOOTDELAY		3
+#define CONFIG_BOOTDELAY		1
 
 #define CONFIG_SYS_MEMTEST_START	0x10000000
 #define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_MEMTEST_START + 500 * SZ_1M)
@@ -136,8 +136,8 @@
 		"netdev=eth0\0"						\
 		"ethprime=FEC0\0"					\
 		"uboot_addr=0xa0000000\0"				\
-		"bootargs=console=ttymxc0,115200 ip=none root=/dev/ram0 rw\0"\
-		"bootcmd=safeboot 1 0x1000 0x20000 0x12000 0x10800000 0x10800000 0x10c00000\0"
+		"bootargs=console=ttymxc1,115200 ip=none root=/dev/ram0 rw\0"\
+		"bootcmd=safeboot 0 0x1000 0x20000 0x12000 0x10800000 0x10800000 0x10c00000\0"
 
 
 /* Miscellaneous configurable options */
