@@ -58,8 +58,8 @@ DECLARE_GLOBAL_DATA_PTR;
 	PAD_CTL_SRE_FAST  | PAD_CTL_HYS)
 
 static struct fsl_esdhc_cfg usdhc_cfg[CONFIG_SYS_FSL_USDHC_NUM] = {
-	{USDHC3_BASE_ADDR},
 	{USDHC2_BASE_ADDR},
+	{USDHC3_BASE_ADDR},
 };
 
 static struct mmc usdhc_mmc[CONFIG_SYS_FSL_USDHC_NUM];
@@ -88,7 +88,7 @@ int board_mmc_init(bd_t *bis)
 
 	for (index = 0; index < CONFIG_SYS_FSL_USDHC_NUM; ++index) {
 		switch (index) {
-		case 0:
+		case 1:
 			MX6QDL_SET_PAD(PAD_SD3_CLK__SD3_CLK   , MUX_PAD_CTRL(USDHC_PAD_CLK_CTRL));
 			MX6QDL_SET_PAD(PAD_SD3_CMD__SD3_CMD   , MUX_PAD_CTRL(USDHC_PAD_CTRL));
 			MX6QDL_SET_PAD(PAD_SD3_DAT0__SD3_DATA0, MUX_PAD_CTRL(USDHC_PAD_CTRL));
@@ -101,7 +101,7 @@ int board_mmc_init(bd_t *bis)
 			MX6QDL_SET_PAD(PAD_SD3_DAT7__SD3_DATA7, MUX_PAD_CTRL(USDHC_PAD_CTRL));
 			usdhc_cfg[index].sdhc_clk = mxc_get_clock(MXC_ESDHC3_CLK);
 			break;
-		case 1:
+		case 0:
 			MX6QDL_SET_PAD(PAD_SD2_CLK__SD2_CLK   , MUX_PAD_CTRL(USDHC_PAD_CLK_CTRL));
 			MX6QDL_SET_PAD(PAD_SD2_CMD__SD2_CMD   , MUX_PAD_CTRL(USDHC_PAD_CTRL));
 			MX6QDL_SET_PAD(PAD_SD2_DAT0__SD2_DATA0, MUX_PAD_CTRL(USDHC_PAD_CTRL));
