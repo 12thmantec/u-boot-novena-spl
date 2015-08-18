@@ -691,8 +691,12 @@ void board_init_r(gd_t *id, ulong dest_addr)
 		setenv("mem", (char *)memsz);
 	}
 #endif
+	extern int alarm_led_on(int color);
+	alarm_led_on(1);
+
 	extern void knob_switch_check(void);
 	knob_switch_check();
+
 
 	/* main_loop() can return to retry autoboot, if so just run it again. */
 	for (;;) {

@@ -173,12 +173,51 @@ void knob_switch_check(void)
 		setenv("knob_switch_pressed", "0");
 }
 
+static void alarm_led_init(void)
+{
+	imx_iomux_v3_setup_pad(MX6DL_PAD_EIM_LBA__GPIO2_IO27 | MUX_PAD_CTRL(NO_PAD_CTRL));
+	imx_iomux_v3_setup_pad(MX6DL_PAD_DISP0_DAT11__GPIO5_IO05 | MUX_PAD_CTRL(NO_PAD_CTRL));
+	imx_iomux_v3_setup_pad(MX6DL_PAD_EIM_RW__GPIO2_IO26 | MUX_PAD_CTRL(NO_PAD_CTRL));
+
+}
+
+int alarm_led_on(int color)
+{
+	unsigned int val;
+
+	/*
+	 * LED1（GREEN）	EIM_LBA(GPIO2_IO27)
+	 * LED2（RED）		DISP0_DAT11(GPIO5_IO05)
+	 * LED3（BLUE）		EIM_RW(GPIO2_IO26)
+	 */
+	val = readl(GPIO2_BASE_ADDR + 0x4);
+	val |= ((1 << 27) | (1 << 26));
+	writel(val, GPIO2_BASE_ADDR + 0x4);
+
+	val = readl(GPIO5_BASE_ADDR + 0x4);
+	val |= (1 << 5);
+	writel(val, GPIO5_BASE_ADDR + 0x4);
+
+
+	val = readl(GPIO2_BASE_ADDR + 0x0);
+	val &= ~(1 << 27);
+	val |= (1 << 26);
+	writel(val, GPIO2_BASE_ADDR + 0x0);
+
+	val = readl(GPIO5_BASE_ADDR + 0x0);
+	val |= (1 << 5);
+	writel(val, GPIO5_BASE_ADDR + 0x0);
+
+	return 0;
+}
 
 int board_init(void)
 {
 	/* address of boot parameters */
 	gd->bd->bi_boot_params = LINUX_BOOT_PARAM_ADDR;
 	knob_init();
+	alarm_led_init();
+
 	return 0;
 }
 
