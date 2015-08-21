@@ -85,12 +85,12 @@ void spl_parse_image_header(const struct image_header *header)
 		}
 		spl_image.os = image_get_os(header);
 		spl_image.name = image_get_name(header);
-		debug("spl: payload image: %.*s load addr: 0x%x size: %d\n",
+		printf("spl: payload image: %.*s load addr: 0x%x size: %d\n",
 			sizeof(spl_image.name), spl_image.name,
 			spl_image.load_addr, spl_image.size);
 	} else {
 		/* Signature not found - assume u-boot.bin */
-		debug("mkimage signature not found - ih_magic = %x\n",
+		printf("mkimage signature not found - ih_magic = %x\n",
 			header->ih_magic);
 		/* Let's assume U-Boot will not be more than 200 KB */
 		spl_image.size = CONFIG_SYS_MONITOR_LEN;
@@ -164,6 +164,14 @@ void board_init_r(gd_t *dummy1, ulong dummy2)
 	case BOOT_DEVICE_MMC2:
 	case BOOT_DEVICE_MMC2_2:
 		spl_mmc_load_image();
+
+		/* for some reason, the SPL may failed to read Uboot from
+		 * SD card, so if we found there is an error, we will try
+		 * to read the Uboot again, but just try one time.
+		 */
+		if (spl_image.entry_point == 0) {
+			spl_mmc_load_image();
+		}
 		break;
 #else
 #error "No SPL MMC support"

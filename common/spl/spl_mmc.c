@@ -43,6 +43,29 @@ static int mmc_load_image_raw(struct mmc *mmc, unsigned long sector)
 	err = mmc->block_dev.block_read(0, sector, image_size_sectors,
 					(void *)spl_image.load_addr);
 
+	if (spl_image.entry_point == 0) {
+		printf("Uboot read error...\n");
+		printf("header->ih_magic = 0x%08x\n", header->ih_magic);
+		printf("header->ih_hcrc  = 0x%08x\n", header->ih_hcrc);
+		printf("header->ih_time  = 0x%08x\n", header->ih_time);
+		printf("header->ih_size  = 0x%08x\n", header->ih_size);
+		printf("header->ih_load  = 0x%08x\n", header->ih_load);
+		printf("header->ih_ep    = 0x%08x\n", header->ih_ep);
+		printf("header->ih_dcrc  = 0x%08x\n", header->ih_dcrc);
+		printf("header->ih_os    = 0x%08x\n", header->ih_os);
+		printf("header->ih_arch  = 0x%08x\n", header->ih_arch);
+		printf("header->ih_type  = 0x%08x\n", header->ih_type);
+		printf("header->ih_comp  = 0x%08x\n", header->ih_comp);
+		printf("header->ih_name  = 0x%s\n",   header->ih_name);
+
+		printf("spl_image.name        = 0x%s\n",   spl_image.name);
+		printf("spl_image.os          = 0x%08x\n", spl_image.os);
+		printf("spl_image.load_addr   = 0x%08x\n", spl_image.load_addr);
+		printf("spl_image.entry_point = 0x%08x\n", spl_image.entry_point);
+		printf("spl_image.size        = 0x%08x\n", spl_image.size);
+		printf("spl_image.flags       = 0x%08x\n", spl_image.flags);
+
+	}
 end:
 #ifdef CONFIG_SPL_LIBCOMMON_SUPPORT
 	if (err == 0)
