@@ -1,4 +1,4 @@
-U_BOOT_VERSION=COventDS_Uboot_v1.3.8
+U_BOOT_VERSION=COventDS_Uboot_v1.3.9
 export U_BOOT_VERSION
 
 CROSS_COMPILE=arm-none-linux-gnueabi-

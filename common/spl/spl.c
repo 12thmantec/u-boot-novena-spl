@@ -27,7 +27,7 @@ DECLARE_GLOBAL_DATA_PTR;
 #endif
 
 u32 *boot_params_ptr = NULL;
-struct spl_image_info spl_image;
+struct spl_image_info spl_image = {0};
 
 /* Define board data structure */
 static bd_t bdata __attribute__ ((section(".data")));
@@ -153,6 +153,7 @@ void board_init_r(gd_t *dummy1, ulong dummy2)
 
 	boot_device = spl_boot_device();
 	debug("boot device - %d\n", boot_device);
+	memset(&spl_image, 0, sizeof(spl_image));
 	switch (boot_device) {
 #ifdef CONFIG_SPL_RAM_DEVICE
 	case BOOT_DEVICE_RAM:
